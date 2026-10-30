@@ -1,4 +1,10 @@
 
+{% extends "base.html" %}
+
+{% block title %}活動清單 - 活動報名系統{% endblock %}
+
+{% block content %}
+
 <div class="event-header">
     <div>
         <h1>活動清單</h1>
@@ -33,13 +39,9 @@
                     {% endif %}
                 </td>
 
-                <td>
-                    {{ event.event_date }}
-                </td>
+                <td>{{ event.event_date }}</td>
 
-                <td>
-                    {{ event.deadline | replace('T', ' ') }}
-                </td>
+                <td>{{ event.deadline | replace('T', ' ') }}</td>
 
                 <td>
                     <span class="signup-count">
