@@ -164,10 +164,10 @@
   </p>
 
   <div class="signup-details">
-    <p><strong>活動日期：</strong>{{ event.event_date }}</p>
+    <p><strong>活動時間（台灣時間）：</strong>{{ event.event_date | taiwan_time }}</p>
     <p>
       <strong>報名截止：</strong>
-      {{ event.deadline | replace('T', ' ') }}
+      {{ event.deadline | taiwan_time }}（台灣時間）
     </p>
 
     {% if event.description %}
@@ -176,6 +176,7 @@
   </div>
 
   <form method="post">
+    {% if errors.database %}<p class="signup-error" role="alert">{{ errors.database }}</p>{% endif %}
     <div class="signup-field">
       <label for="name">
         姓名 <span class="signup-required">＊</span>
@@ -223,7 +224,7 @@
       >
 
       <p id="phone-hint" class="signup-hint">
-        請輸入 10 碼手機號碼，不含空格或連字號。同一手機號碼只能報名此活動一次。
+        請輸入 10 碼手機號碼，不含空格或連字號。同一活動不可使用相同姓名與電話重複報名。
       </p>
 
       {% if errors.phone %}

@@ -20,7 +20,7 @@
         <thead>
             <tr>
                 <th>活動資訊</th>
-                <th>活動日期</th>
+                <th>活動時間（台灣）</th>
                 <th>報名截止</th>
                 <th>報名人數</th>
                 <th>操作</th>
@@ -39,9 +39,9 @@
                     {% endif %}
                 </td>
 
-                <td>{{ event.event_date }}</td>
+                <td>{{ event.event_date | taiwan_time }}</td>
 
-                <td>{{ event.deadline | replace('T', ' ') }}</td>
+                <td>{{ event.deadline | taiwan_time }}</td>
 
                 <td>
                     <span class="signup-count">
@@ -50,9 +50,13 @@
                 </td>
 
                 <td class="actions">
+                    {% if not registration_closed(event) %}
                     <a class="btn" href="{{ url_for('registrations.register', event_id=event.id) }}">
                         立即報名
                     </a>
+                    {% else %}
+                    <span class="closed-status">{{ registration_status(event) }}</span>
+                    {% endif %}
 
                     <a class="btn btn-outline" href="{{ url_for('attendees.list_attendees', event_id=event.id) }}">
                         報名清單

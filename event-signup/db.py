@@ -1,14 +1,16 @@
 import sqlite3
+from datetime import timedelta
 
 import click
 from flask import current_app, g
 from flask.cli import with_appcontext
+from time_utils import now_taiwan
 
 
 def get_db():
     """取得目前請求共用的資料庫連線。"""
     if "db" not in g:
-        g.db = sqlite3.connect(current_app.config["DATABASE"])
+        g.db = sqlite3.connect(current_app.config["DATABASE"], timeout=5)
         g.db.row_factory = sqlite3.Row
         g.db.execute("PRAGMA foreign_keys = ON")
     return g.db
@@ -24,6 +26,18 @@ def init_db():
     db = get_db()
     with current_app.open_resource("schema.sql") as f:
         db.executescript(f.read().decode("utf-8"))
+    migrate_db()
+
+
+def migrate_db():
+    """只新增索引與保護觸發器，不清理或刪除既有資料。"""
+    db = get_db()
+    try:
+        with current_app.open_resource("migration.sql") as source:
+            db.executescript("BEGIN IMMEDIATE;\n" + source.read().decode("utf-8") + "\nCOMMIT;")
+    except sqlite3.Error:
+        db.rollback()
+        raise
 
 
 SAMPLE_EVENTS = [
@@ -57,11 +71,13 @@ def seed_db():
     if db.execute("SELECT COUNT(*) FROM events").fetchone()[0] > 0:
         return False
 
-    for event in SAMPLE_EVENTS:
+    today = now_taiwan().date()
+    for offset, event in enumerate(SAMPLE_EVENTS):
+        start = today + timedelta(days=30 + offset * 15)
         cur = db.execute(
             "INSERT INTO events (title, description, event_date, deadline)"
             " VALUES (?, ?, ?, ?)",
-            (event["title"], event["description"], event["event_date"], event["deadline"]),
+            (event["title"], event["description"], f"{start}T14:00", f"{start - timedelta(days=1)}T18:00"),
         )
         db.executemany(
             "INSERT INTO registrations (event_id, name, phone) VALUES (?, ?, ?)",
@@ -79,6 +95,17 @@ def init_db_command():
     click.echo("資料庫初始化完成。")
 
 
+@click.command("migrate-db")
+@with_appcontext
+def migrate_db_command():
+    """為既有資料庫新增重複報名保護，保留所有資料。"""
+    try:
+        migrate_db()
+    except sqlite3.Error as error:
+        raise click.ClickException("遷移失敗，已回滾。請確認已初始化資料庫並稍後重試。") from error
+    click.echo("資料庫遷移完成，既有資料保留。")
+
+
 @click.command("seed-db")
 @with_appcontext
 def seed_db_command():
@@ -93,4 +120,5 @@ def seed_db_command():
 def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
+    app.cli.add_command(migrate_db_command)
     app.cli.add_command(seed_db_command)

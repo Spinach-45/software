@@ -3,9 +3,11 @@
 {% block content %}
 <h1>{{ event.title }}</h1>
 <p>目前報名人數：<strong>{{ count }}</strong> 人</p>
+<p>報名狀態：{{ registration_status(event) }}；報名時間以台灣時間顯示。</p>
 
 {% if attendees %}
-<table class="table">
+<p class="table-hint muted">小螢幕可左右滑動表格查看完整資料。</p>
+<div class="event-container"><table class="table attendees-table">
   <thead>
     <tr>
       <th>序號</th>
@@ -20,17 +22,26 @@
       <td>{{ loop.index }}</td>
       <td>{{ a.name }}</td>
       <td>{{ a.phone }}</td>
-      <td>{{ a.created_at }}</td>
+      <td>{{ a.created_at or '時間資料異常' }}</td>
     </tr>
     {% endfor %}
   </tbody>
-</table>
+</table></div>
 {% else %}
 <p class="muted">目前還沒有人報名。</p>
 {% endif %}
 
 <p class="form-actions">
+  {% if not registration_closed(event) %}
   <a class="btn" href="{{ url_for('registrations.register', event_id=event.id) }}">報名此活動</a>
+  {% endif %}
   <a href="{{ url_for('events.index') }}">返回活動清單</a>
 </p>
+{% if not event.is_closed %}
+<form method="post" action="{{ url_for('events.close', event_id=event.id) }}" class="close-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <p class="muted">手動關閉後，此活動將不再接受報名。</p>
+  <button type="submit" class="btn btn-outline">手動關閉報名</button>
+</form>
+{% endif %}
 {% endblock %}

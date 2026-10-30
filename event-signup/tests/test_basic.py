@@ -33,8 +33,8 @@ def test_create_event_register_and_list(app, client):
         data={
             "title": "程式讀書會",
             "description": "每週一次",
-            "event_date": "2026-12-01",
-            "deadline": "2026-11-25T18:00",
+            "event_date": "2099-12-01T12:00",
+            "deadline": "2099-11-25T18:00",
         },
         follow_redirects=True,
     )
@@ -65,7 +65,7 @@ def test_create_event_register_and_list(app, client):
 def test_register_validation_keeps_input(app, client):
     client.post(
         "/events/new",
-        data={"title": "A", "event_date": "2026-12-01", "deadline": "2026-11-25T18:00"},
+        data={"title": "A", "event_date": "2099-12-01T12:00", "deadline": "2099-11-25T18:00"},
     )
     resp = client.post("/events/1/register", data={"name": "小華", "phone": "  "})
     html = resp.get_data(as_text=True)

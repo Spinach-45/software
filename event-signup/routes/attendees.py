@@ -10,15 +10,13 @@ bp = Blueprint("attendees", __name__)
 def list_attendees(event_id):
     event = get_event_or_404(event_id)
     db = get_db()
-    # created_at 以 UTC 儲存，顯示時轉成本地時間
+    # created_at 以 UTC 儲存，固定顯示台灣時間，不依賴主機時區。
     attendees = db.execute(
-        "SELECT name, phone, datetime(created_at, 'localtime') AS created_at"
+        "SELECT name, phone, datetime(created_at, '+8 hours') AS created_at"
         " FROM registrations WHERE event_id = ? ORDER BY id",
         (event_id,),
     ).fetchall()
-    count = db.execute(
-        "SELECT COUNT(*) FROM registrations WHERE event_id = ?", (event_id,)
-    ).fetchone()[0]
+    count = len(attendees)
     return render_template(
         "attendees/list.html", event=event, attendees=attendees, count=count
     )

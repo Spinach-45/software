@@ -10,8 +10,8 @@
 body {
     margin: 0;
     font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
-    color: #222;
-    background: #f5f6f8;
+    color: #35463c;
+    background: #faf6ed;
     line-height: 1.6;
 }
 
@@ -45,7 +45,7 @@ a {
 ============================== */
 
 .navbar {
-    background: #2c3e50;
+    background: #55754f;
     padding: 12px 0;
 }
 
@@ -102,7 +102,7 @@ a {
 a.btn {
     display: inline-block;
     padding: 9px 16px;
-    background: #3478d4;
+    background: #55754f;
     color: #fff;
     border: none;
     border-radius: 6px;
@@ -113,7 +113,7 @@ a.btn {
 }
 
 .btn:hover {
-    background: #2864b5;
+    background: #405f3c;
 }
 
 
@@ -416,4 +416,34 @@ a.btn {
         text-align: center;
     }
 
+}
+
+/* 延續奶油色與綠色報名卡片，讓長文字及小螢幕保持可讀。 */
+h1, h2, td, .flash, .signup-details { overflow-wrap: anywhere; }
+.navbar .container { flex-wrap: wrap; }
+.event-container, .form-card, .empty-state, .table { background: #fffdf8; }
+.table th { background: #f2f5eb; }
+.signup-count { background: #edf3e7; color: #405f3c; }
+.btn-outline { background: #fffdf8; border-color: #55754f; color: #405f3c; }
+.btn-outline:hover { background: #edf3e7; }
+.btn-submit { background: #55754f; }
+.btn-submit:hover { background: #405f3c; }
+.hint, .muted, .form-header .muted { color: #65715f; }
+.closed-status { display: block; color: #8a5141; white-space: normal; margin-bottom: 8px; }
+.actions { white-space: normal; min-width: 145px; }
+.actions .btn { margin-bottom: 6px; }
+.event-info { min-width: 150px; max-width: 350px; }
+.event-description { white-space: pre-line; }
+.attendees-table { min-width: 510px; }
+.attendees-table td:nth-child(3), .attendees-table td:nth-child(4) { white-space: nowrap; }
+.table-hint { display: none; }
+button, input, textarea { font-family: inherit; }
+input[type="datetime-local"] { min-width: 0; max-width: 100%; }
+.close-form { margin: 24px 0; padding: 16px; border: 1px solid #e3daca; border-radius: 12px; }
+@media (max-width: 600px) {
+    h1 { font-size: 1.6rem; }
+    .table-hint { display: block; }
+    .navbar .brand { flex-basis: 100%; }
+    .navbar .container { gap: 8px 18px; }
+    .form-actions { flex-wrap: wrap; }
 }
