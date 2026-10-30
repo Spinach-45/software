@@ -25,6 +25,18 @@ venv/bin/python -m pip install -r requirements.txt
 
 會在專案目錄建立 `event_signup.db`。
 
+## 範例資料（選用）
+
+```powershell
+.\venv\Scripts\python.exe -m flask --app app seed-db
+```
+
+寫入 3 筆範例活動和幾筆報名，讓每個人都有一樣的測試資料。
+資料庫已經有活動時會自動略過，不會覆蓋或重複寫入。
+
+> `event_signup.db` 不會進 git，每個人的資料是各自獨立的。
+> 想要從頭來過：刪掉 `event_signup.db`，再執行 `seed-db`（它會順便建立資料表）。
+
 ## 啟動
 
 ```powershell

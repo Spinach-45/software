@@ -1,37 +1,180 @@
+<style type="text/css">
+/* 活動頁面標題 */
+.event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.event-header h1 {
+    margin-bottom: 8px;
+}
+
+.muted {
+    color: #777;
+}
+
+/* 活動表格 */
+.event-container {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    overflow-x: auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    background-color: #f3f5f8;
+    color: #444;
+    padding: 15px;
+    text-align: left;
+}
+
+.table td {
+    padding: 16px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.table tbody tr:hover {
+    background-color: #f9fafc;
+}
+
+.event-info strong {
+    font-size: 16px;
+}
+
+.event-description {
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+/* 報名人數 */
+.signup-count {
+    background-color: #eaf2ff;
+    color: #3478d4;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+}
+
+/* 操作按鈕 */
+.actions {
+    white-space: nowrap;
+}
+
+.actions a {
+    display: inline-block;
+    margin-right: 5px;
+    text-decoration: none;
+}
+
+.btn-outline {
+    background-color: white;
+    color: #3478d4;
+    border: 1px solid #3478d4;
+    padding: 8px 12px;
+    border-radius: 5px;
+}
+
+/* 沒有活動時 */
+.empty-state {
+    text-align: center;
+    background-color: #f8f9fb;
+    padding: 60px 20px;
+    border-radius: 10px;
+}
+
+.empty-state h2 {
+    color: #444;
+}
+
+.empty-state p {
+    margin-bottom: 20px;
+}
+
 {% extends "base.html" %}
+
 {% block title %}活動清單 - 活動報名系統{% endblock %}
+
 {% block content %}
-<h1>活動清單</h1>
+</style>
+<div class="event-header">
+    <div>
+        <h1>活動清單</h1>
+        <p class="muted">瀏覽目前開放的活動，選擇有興趣的活動進行報名。</p>
+    </div>
+    <a class="btn" href="{{ url_for('events.new') }}">＋ 新增活動</a>
+</div>
+
 {% if events %}
-<table class="table">
-  <thead>
-    <tr>
-      <th>活動名稱</th>
-      <th>活動日期</th>
-      <th>截止報名時間</th>
-      <th>報名人數</th>
-      <th>操作</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for event in events %}
-    <tr>
-      <td>
-        <strong>{{ event.title }}</strong>
-        {% if event.description %}<div class="muted">{{ event.description }}</div>{% endif %}
-      </td>
-      <td>{{ event.event_date }}</td>
-      <td>{{ event.deadline | replace('T', ' ') }}</td>
-      <td>{{ event.signup_count }}</td>
-      <td class="actions">
-        <a class="btn" href="{{ url_for('registrations.register', event_id=event.id) }}">報名</a>
-        <a href="{{ url_for('attendees.list_attendees', event_id=event.id) }}">查看報名清單</a>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+
+<div class="event-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>活動資訊</th>
+                <th>活動日期</th>
+                <th>報名截止</th>
+                <th>報名人數</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for event in events %}
+            <tr>
+                <td class="event-info">
+                    <strong>{{ event.title }}</strong>
+                    {% if event.description %}
+                    <div class="muted event-description">
+                        {{ event.description }}
+                    </div>
+                    {% endif %}
+                </td>
+
+                <td>
+                    {{ event.event_date }}
+                </td>
+
+                <td>
+                    {{ event.deadline | replace('T', ' ') }}
+                </td>
+
+                <td>
+                    <span class="signup-count">
+                        {{ event.signup_count }} 人
+                    </span>
+                </td>
+
+                <td class="actions">
+                    <a class="btn" href="{{ url_for('registrations.register', event_id=event.id) }}">
+                        立即報名
+                    </a>
+
+                    <a class="btn btn-outline" href="{{ url_for('attendees.list_attendees', event_id=event.id) }}">
+                        報名清單
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 {% else %}
-<p class="muted">目前沒有活動，<a href="{{ url_for('events.new') }}">新增一個活動</a>。</p>
+
+<div class="empty-state">
+    <h2>目前還沒有活動</h2>
+    <p class="muted">目前沒有任何活動，快來建立第一個活動吧！</p>
+    <a class="btn" href="{{ url_for('events.new') }}">＋ 建立新活動</a>
+</div>
+
 {% endif %}
+
 {% endblock %}

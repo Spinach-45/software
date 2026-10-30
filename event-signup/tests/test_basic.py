@@ -75,6 +75,19 @@ def test_register_validation_keeps_input(app, client):
         assert get_db().execute("SELECT COUNT(*) FROM registrations").fetchone()[0] == 0
 
 
+def test_seed_db_runs_once(app, client):
+    runner = app.test_cli_runner()
+    assert "已寫入" in runner.invoke(args=["seed-db"]).output
+    assert "略過" in runner.invoke(args=["seed-db"]).output
+
+    with app.app_context():
+        db = get_db()
+        assert db.execute("SELECT COUNT(*) FROM events").fetchone()[0] == 3
+        assert db.execute("SELECT COUNT(*) FROM registrations").fetchone()[0] == 3
+
+    assert "Python 入門工作坊" in client.get("/").get_data(as_text=True)
+
+
 def test_missing_event_returns_404(client):
     assert client.get("/events/999/register").status_code == 404
     assert client.get("/events/999/attendees").status_code == 404
