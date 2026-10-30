@@ -1,24 +1,247 @@
 {% extends "base.html" %}
+
 {% block title %}報名：{{ event.title }} - 活動報名系統{% endblock %}
+
 {% block content %}
-<h1>報名：{{ event.title }}</h1>
-<p class="muted">
-  活動日期：{{ event.event_date }}　｜　截止報名：{{ event.deadline | replace('T', ' ') }}
-</p>
-{% if event.description %}<p>{{ event.description }}</p>{% endif %}
+<style>
+  .signup-panel,
+  .signup-panel * {
+    box-sizing: border-box;
+  }
 
-<form method="post" class="form" novalidate>
-  <label for="name">姓名 <span class="required">*</span></label>
-  <input id="name" name="name" value="{{ form.name }}" required>
-  {% if errors.name %}<p class="error">{{ errors.name }}</p>{% endif %}
+  .signup-panel {
+    max-width: 660px;
+    margin: 32px auto;
+    padding: 36px;
+    color: #35463c;
+    background: #fffdf8;
+    border: 1px solid #e6e9dc;
+    border-radius: 24px;
+    box-shadow: 0 12px 36px rgba(61, 87, 65, 0.08);
+    font-family: Arial, "Microsoft JhengHei", sans-serif;
+  }
 
-  <label for="phone">聯絡電話 <span class="required">*</span></label>
-  <input id="phone" name="phone" type="tel" value="{{ form.phone }}" required>
-  {% if errors.phone %}<p class="error">{{ errors.phone }}</p>{% endif %}
+  .signup-panel .signup-tag {
+    display: inline-block;
+    padding: 7px 14px;
+    color: #526b50;
+    background: #edf3e7;
+    border-radius: 20px;
+    font-size: 14px;
+  }
 
-  <div class="form-actions">
-    <button type="submit" class="btn">送出報名</button>
-    <a href="{{ url_for('events.index') }}">返回活動清單</a>
+  .signup-panel h1 {
+    margin: 18px 0 12px;
+    color: #354f3d;
+    font-size: 28px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .signup-panel .signup-intro {
+    margin-bottom: 24px;
+    color: #738071;
+    line-height: 1.8;
+  }
+
+  .signup-panel .signup-details {
+    margin-bottom: 28px;
+    padding: 18px 20px;
+    background: #f2f5eb;
+    border-radius: 14px;
+    line-height: 1.8;
+  }
+
+  .signup-panel .signup-details p {
+    margin: 6px 0;
+  }
+
+  .signup-panel .signup-description {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .signup-panel .signup-field {
+    margin-bottom: 24px;
+  }
+
+  .signup-panel label {
+    display: block;
+    margin-bottom: 9px;
+    font-weight: bold;
+  }
+
+  .signup-panel .signup-required {
+    color: #ae594c;
+  }
+
+  .signup-panel input {
+    display: block;
+    width: 100%;
+    padding: 14px 16px;
+    color: #35463c;
+    background: white;
+    border: 1px solid #cbd5c5;
+    border-radius: 12px;
+    font: inherit;
+  }
+
+  .signup-panel input:focus {
+    outline: 3px solid #e0ebd9;
+    border-color: #698560;
+  }
+
+  .signup-panel input[aria-invalid="true"] {
+    border-color: #ae594c;
+  }
+
+  .signup-panel .signup-hint {
+    margin: 8px 0 0;
+    color: #74806e;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .signup-panel .signup-error {
+    margin: 8px 0 0;
+    color: #a83f36;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .signup-panel .signup-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 28px;
+  }
+
+  .signup-panel .signup-submit {
+    padding: 14px 28px;
+    color: white;
+    background: #55754f;
+    border: 0;
+    border-radius: 12px;
+    font: inherit;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .signup-panel .signup-submit:hover {
+    background: #405f3c;
+  }
+
+  .signup-panel .signup-back {
+    color: #526b50;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  @media (max-width: 600px) {
+    .signup-panel {
+      margin: 16px auto;
+      padding: 24px 18px;
+    }
+
+    .signup-panel h1 {
+      font-size: 23px;
+    }
+
+    .signup-panel .signup-submit {
+      width: 100%;
+    }
+  }
+</style>
+
+<section class="signup-panel">
+  <span class="signup-tag">活動報名</span>
+
+  <h1>{{ event.title }}</h1>
+
+  <p class="signup-intro">
+    填寫以下資料，和我們一起留下美好的活動回憶。
+  </p>
+
+  <div class="signup-details">
+    <p><strong>活動日期：</strong>{{ event.event_date }}</p>
+    <p>
+      <strong>報名截止：</strong>
+      {{ event.deadline | replace('T', ' ') }}
+    </p>
+
+    {% if event.description %}
+    <p class="signup-description">{{ event.description }}</p>
+    {% endif %}
   </div>
-</form>
+
+  <form method="post">
+    <div class="signup-field">
+      <label for="name">
+        姓名 <span class="signup-required">＊</span>
+      </label>
+
+      <input
+        id="name"
+        name="name"
+        type="text"
+        value="{{ form.name }}"
+        placeholder="請輸入姓名"
+        autocomplete="name"
+        maxlength="50"
+        required
+        aria-invalid="{{ 'true' if errors.name else 'false' }}"
+        {% if errors.name %}aria-describedby="name-error"{% endif %}
+      >
+
+      {% if errors.name %}
+      <p id="name-error" class="signup-error" role="alert">
+        {{ errors.name }}
+      </p>
+      {% endif %}
+    </div>
+
+    <div class="signup-field">
+      <label for="phone">
+        聯絡電話 <span class="signup-required">＊</span>
+      </label>
+
+      <input
+        id="phone"
+        name="phone"
+        type="tel"
+        value="{{ form.phone }}"
+        placeholder="例如：0912345678"
+        autocomplete="tel"
+        inputmode="numeric"
+        pattern="09[0-9]{8}"
+        maxlength="10"
+        title="請輸入 09 開頭的 10 碼手機號碼"
+        required
+        aria-invalid="{{ 'true' if errors.phone else 'false' }}"
+        aria-describedby="phone-hint{% if errors.phone %} phone-error{% endif %}"
+      >
+
+      <p id="phone-hint" class="signup-hint">
+        請輸入 10 碼手機號碼，不含空格或連字號。同一手機號碼只能報名此活動一次。
+      </p>
+
+      {% if errors.phone %}
+      <p id="phone-error" class="signup-error" role="alert">
+        {{ errors.phone }}
+      </p>
+      {% endif %}
+    </div>
+
+    <div class="signup-actions">
+      <button type="submit" class="signup-submit">
+        確認送出報名
+      </button>
+
+      <a href="{{ url_for('events.index') }}" class="signup-back">
+        返回活動清單
+      </a>
+    </div>
+  </form>
+</section>
 {% endblock %}
