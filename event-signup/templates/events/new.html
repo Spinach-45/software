@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}新增活動 - 活動報名系統{% endblock %}
+{% block content %}
+<h1>新增活動</h1>
+<form method="post" class="form" novalidate>
+  <label for="title">活動名稱 <span class="required">*</span></label>
+  <input id="title" name="title" value="{{ form.title }}" required>
+  {% if errors.title %}<p class="error">{{ errors.title }}</p>{% endif %}
+
+  <label for="description">說明</label>
+  <textarea id="description" name="description" rows="4">{{ form.description }}</textarea>
+
+  <label for="event_date">活動日期 <span class="required">*</span></label>
+  <input id="event_date" name="event_date" type="date" value="{{ form.event_date }}" required>
+  {% if errors.event_date %}<p class="error">{{ errors.event_date }}</p>{% endif %}
+
+  <label for="deadline">截止報名時間 <span class="required">*</span></label>
+  <input id="deadline" name="deadline" type="datetime-local" value="{{ form.deadline }}" required>
+  {% if errors.deadline %}<p class="error">{{ errors.deadline }}</p>{% endif %}
+
+  <div class="form-actions">
+    <button type="submit" class="btn">建立活動</button>
+    <a href="{{ url_for('events.index') }}">取消</a>
+  </div>
+</form>
+{% endblock %}

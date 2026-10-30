@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}活動清單 - 活動報名系統{% endblock %}
+{% block content %}
+<h1>活動清單</h1>
+{% if events %}
+<table class="table">
+  <thead>
+    <tr>
+      <th>活動名稱</th>
+      <th>活動日期</th>
+      <th>截止報名時間</th>
+      <th>報名人數</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for event in events %}
+    <tr>
+      <td>
+        <strong>{{ event.title }}</strong>
+        {% if event.description %}<div class="muted">{{ event.description }}</div>{% endif %}
+      </td>
+      <td>{{ event.event_date }}</td>
+      <td>{{ event.deadline | replace('T', ' ') }}</td>
+      <td>{{ event.signup_count }}</td>
+      <td class="actions">
+        <a class="btn" href="{{ url_for('registrations.register', event_id=event.id) }}">報名</a>
+        <a href="{{ url_for('attendees.list_attendees', event_id=event.id) }}">查看報名清單</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">目前沒有活動，<a href="{{ url_for('events.new') }}">新增一個活動</a>。</p>
+{% endif %}
+{% endblock %}

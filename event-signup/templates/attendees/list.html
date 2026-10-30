@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}報名清單：{{ event.title }} - 活動報名系統{% endblock %}
+{% block content %}
+<h1>{{ event.title }}</h1>
+<p>目前報名人數：<strong>{{ count }}</strong> 人</p>
+
+{% if attendees %}
+<table class="table">
+  <thead>
+    <tr>
+      <th>序號</th>
+      <th>姓名</th>
+      <th>電話</th>
+      <th>報名時間</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for a in attendees %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>{{ a.name }}</td>
+      <td>{{ a.phone }}</td>
+      <td>{{ a.created_at }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="muted">目前還沒有人報名。</p>
+{% endif %}
+
+<p class="form-actions">
+  <a class="btn" href="{{ url_for('registrations.register', event_id=event.id) }}">報名此活動</a>
+  <a href="{{ url_for('events.index') }}">返回活動清單</a>
+</p>
+{% endblock %}
